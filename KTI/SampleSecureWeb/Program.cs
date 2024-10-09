@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using SampleSecureWeb;
 using SampleSecureWeb.Data;
@@ -10,7 +11,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext> (options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddCookie(Options =>
+{
+    Options.LoginPath ="/Account/Login";
+    Options.AccessDeniedPath ="/Account/AccessDenied";
+});
+
 builder.Services.AddScoped<IStundet, StudentData>();
+builder.Services.AddScoped<IUser, UserData>();
 
 var app = builder.Build();
 
@@ -26,6 +35,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseAuthorization();
 
